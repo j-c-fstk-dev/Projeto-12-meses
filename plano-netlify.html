@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Muro da Liberdade — Plano de Execução</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #10161F;
+    --surface: #16202B;
+    --surface-raised: #1C2836;
+    --line: #2A3A49;
+    --brass: #C9A227;
+    --brass-dim: #7A6A30;
+    --teal: #4A8B8C;
+    --ink: #E8E4D9;
+    --ink-dim: #8FA0AC;
+    --brick-off: #24303D;
+    --brick-on: #C9A227;
+    --danger: #B5654A;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    background-image:
+      linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 28px 28px;
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    padding-bottom:80px;
+  }
+  .wrap{max-width:720px;margin:0 auto;padding:28px 18px 40px;}
+
+  header.top{margin-bottom:22px;}
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--teal);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  #today-date{color:var(--ink-dim);}
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:28px;
+    margin:10px 0 4px;
+    letter-spacing:-0.01em;
+  }
+  .sub{color:var(--ink-dim);font-size:14px;line-height:1.5;margin:0;}
+
+  /* ---- Brick wall signature ---- */
+  .wall-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:18px 18px 14px;
+    margin-top:18px;
+  }
+  .wall-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:10px;
+  }
+  .wall-label b{color:var(--brass);font-weight:600;}
+  .wall{
+    display:grid;
+    grid-template-columns:repeat(10, 1fr);
+    gap:3px;
+  }
+  .brick{
+    aspect-ratio:2/1;
+    background:var(--brick-off);
+    border-radius:2px;
+    transition:background .4s ease, transform .3s ease;
+  }
+  .brick.on{
+    background:linear-gradient(160deg, #E0BC49, var(--brick-on));
+    box-shadow:0 0 0 1px rgba(0,0,0,.15) inset;
+  }
+  .brick.today-marker{
+    box-shadow:0 0 0 2px var(--teal);
+  }
+
+  /* ---- Daily base decree ---- */
+  .decree-card{
+    background:linear-gradient(180deg, var(--surface-raised), var(--surface));
+    border:1px solid var(--line);
+    border-left:3px solid var(--brass);
+    border-radius:10px;
+    padding:20px;
+    margin-top:16px;
+  }
+  .decree-tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--brass);
+    margin-bottom:8px;
+    display:block;
+  }
+  .decree-text{
+    font-family:'Fraunces', serif;
+    font-size:19px;
+    line-height:1.45;
+    font-weight:600;
+    color:var(--ink);
+    margin:0 0 16px;
+  }
+  .toggles{display:flex;gap:10px;flex-wrap:wrap;}
+  .toggle-btn{
+    flex:1;
+    min-width:140px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    color:var(--ink-dim);
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:.03em;
+    padding:11px 12px;
+    border-radius:7px;
+    cursor:pointer;
+    text-align:left;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    transition:all .15s ease;
+  }
+  .toggle-btn .box{
+    width:14px;height:14px;border-radius:3px;
+    border:1.5px solid var(--ink-dim);
+    flex-shrink:0;
+  }
+  .toggle-btn.checked{
+    background:rgba(201,162,39,0.1);
+    border-color:var(--brass);
+    color:var(--ink);
+  }
+  .toggle-btn.checked .box{
+    background:var(--brass);
+    border-color:var(--brass);
+  }
+  .toggle-btn:active{transform:scale(0.98);}
+
+  .close-day-row{
+    margin-top:16px;
+  }
+  .close-day-btn{
+    width:100%;
+    background:var(--surface);
+    border:1.5px solid var(--line);
+    color:var(--ink-dim);
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    padding:13px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .close-day-btn.ready{
+    background:linear-gradient(160deg, #E0BC49, var(--brick-on));
+    border-color:var(--brick-on);
+    color:#10161F;
+    font-weight:700;
+  }
+  .close-day-btn:active{transform:scale(0.98);}
+  .close-day-hint{
+    margin:8px 0 0;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:.02em;
+    color:var(--ink-dim);
+    text-align:center;
+  }
+  .week-done-msg{
+    font-family:'Fraunces', serif;
+    font-size:16px;
+    color:var(--ink);
+    text-align:center;
+    padding:8px 0 2px;
+  }
+
+  .reflect{
+    margin-top:12px;
+  }
+  .reflect label{
+    display:block;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--ink-dim);
+    margin-bottom:6px;
+  }
+  .reflect textarea{
+    width:100%;
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:6px;
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    font-size:13.5px;
+    padding:10px;
+    resize:vertical;
+    min-height:44px;
+  }
+  .reflect textarea:focus{outline:1px solid var(--teal);}
+
+  /* ---- Week section ---- */
+  .week-head{
+    margin-top:34px;
+    margin-bottom:4px;
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+  }
+  .week-head h2{
+    font-family:'Fraunces', serif;
+    font-size:20px;
+    font-weight:700;
+    margin:0;
+  }
+  .week-progress-text{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:var(--teal);
+  }
+  .week-bar{
+    height:5px;
+    background:var(--surface);
+    border-radius:3px;
+    overflow:hidden;
+    margin:10px 0 20px;
+    border:1px solid var(--line);
+  }
+  .week-bar-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--brass-dim), var(--brass));
+    width:0%;
+    transition:width .5s ease;
+  }
+
+  .day-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:16px 16px 15px;
+    margin-bottom:10px;
+    transition:border-color .2s ease;
+  }
+  .day-card.done{
+    border-color:var(--brass-dim);
+    background:linear-gradient(180deg, rgba(201,162,39,0.06), var(--surface));
+  }
+  .day-top{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    cursor:pointer;
+  }
+  .day-check{
+    width:22px;height:22px;
+    border-radius:5px;
+    border:1.5px solid var(--ink-dim);
+    flex-shrink:0;
+    margin-top:2px;
+    display:flex;align-items:center;justify-content:center;
+    transition:all .15s ease;
+  }
+  .day-card.done .day-check{
+    background:var(--brass);
+    border-color:var(--brass);
+  }
+  .day-check svg{opacity:0;width:13px;height:13px;transition:opacity .15s;}
+  .day-card.done .day-check svg{opacity:1;}
+  .day-meta{flex:1;}
+  .day-num{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--teal);
+    margin-bottom:3px;
+  }
+  .day-decree{
+    font-family:'Fraunces', serif;
+    font-size:15.5px;
+    font-weight:600;
+    line-height:1.4;
+    margin:0 0 6px;
+    color:var(--ink);
+  }
+  .day-card.done .day-decree{color:var(--ink-dim);text-decoration:line-through;text-decoration-color:var(--brass-dim);}
+  .day-action{
+    font-size:13.5px;
+    line-height:1.5;
+    color:var(--ink-dim);
+    margin:0;
+  }
+  .day-action b{color:var(--ink);font-weight:600;}
+  .day-card.locked{opacity:.4;}
+  .day-card.locked .day-top{cursor:default;}
+  .day-card.active .day-top{cursor:pointer;}
+  .day-card.active{border-color:var(--teal);}
+  .day-hint{
+    margin:8px 0 0;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:.02em;
+    color:var(--teal);
+  }
+  .day-hint.blocked{color:var(--danger);}
+
+  /* ---- History / log ---- */
+  .history-toggle-row{
+    margin-top:28px;
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+  .history-btn{
+    background:none;
+    border:1px solid var(--line);
+    color:var(--ink-dim);
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    padding:8px 14px;
+    border-radius:6px;
+    cursor:pointer;
+  }
+  .history-btn:hover{border-color:var(--teal);color:var(--teal);}
+  .history-card{
+    margin-top:14px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:16px;
+  }
+  .history-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+    margin-bottom:12px;
+  }
+  .history-empty{color:var(--ink-dim);font-size:13px;}
+  .history-item{
+    padding:10px 0;
+    border-top:1px solid var(--line);
+  }
+  .history-item:first-child{border-top:none;}
+  .history-date{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--teal);
+    margin-bottom:3px;
+  }
+  .history-note{font-size:13.5px;color:var(--ink);line-height:1.5;}
+  .history-note i{color:var(--ink-dim);}
+
+  /* ---- Roadmap strip ---- */
+  .roadmap{
+    margin-top:36px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:16px;
+  }
+  .roadmap-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+    margin-bottom:12px;
+  }
+  .roadmap-grid{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .rm-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:7px 8px;
+    border-radius:6px;
+    font-size:12.5px;
+  }
+  .rm-item.active{background:rgba(201,162,39,0.1);}
+  .rm-num{
+    font-family:'JetBrains Mono', monospace;
+    color:var(--ink-dim);
+    width:20px;
+    flex-shrink:0;
+  }
+  .rm-item.active .rm-num{color:var(--brass);}
+  .rm-name{color:var(--ink-dim);}
+  .rm-item.active .rm-name{color:var(--ink);font-weight:600;}
+  .rm-item.done .rm-num::after{content:"✓";margin-left:2px;color:var(--brass-dim);}
+
+  .reset-row{
+    margin-top:28px;
+    text-align:center;
+  }
+  .reset-btn{
+    background:none;
+    border:1px solid var(--line);
+    color:var(--ink-dim);
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    padding:8px 14px;
+    border-radius:6px;
+    cursor:pointer;
+  }
+  .reset-btn:hover{border-color:var(--danger);color:var(--danger);}
+
+  .loading{
+    text-align:center;
+    padding:60px 0;
+    color:var(--ink-dim);
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="loading" id="loading">carregando plano…</div>
+</div>
+
+<script>
+(function(){
+
+const WEEK1_DAYS = [
+  {
+    decree: "Eu me levanto e ajo antes que a mente reclame. A vontade não decide — a ação decide.",
+    action: "Nos primeiros 30 minutos após acordar: sem celular. Beba água, respire, escreva 1 tarefa prioritária do dia num papel."
+  },
+  {
+    decree: "Eu faço o mais difícil primeiro. O que eu evito é exatamente o que me liberta.",
+    action: "Identifique a tarefa que você mais evita hoje. Execute ela antes de qualquer outra coisa, mesmo que pela metade."
+  },
+  {
+    decree: "Meu tempo tem fronteiras. Onde não há limite, não há foco.",
+    action: "Use blocos de 25 minutos (Pomodoro) para a tarefa prioritária. Mínimo 3 blocos hoje, com celular fora da sala."
+  },
+  {
+    decree: "Eu enxergo meus gatilhos de fuga e escolho não obedecer a eles.",
+    action: "Identifique 1 gatilho de procrastinação de hoje (rolar feed, abrir vídeo, conversa tóxica) e remova o acesso a ele por 4 horas (app bloqueado, celular em outro cômodo)."
+  },
+  {
+    decree: "Minha palavra tem peso. Eu me comprometo em voz alta porque isso me responsabiliza.",
+    action: "Diga para 1 pessoa (parceira, amigo, grupo) qual tarefa você vai concluir hoje. Confirme a conclusão com essa pessoa à noite."
+  },
+  {
+    decree: "Eu reconheço meu avanço em vez de só cobrar meu atraso.",
+    action: "Revise os últimos 5 dias: liste 3 vitórias reais (por menores que sejam) e 1 ajuste para a próxima semana. Escreva, não apenas pense."
+  },
+  {
+    decree: "Descanso é parte da disciplina, não a negação dela. Eu me preparo para continuar.",
+    action: "Sem trabalho 'produtivo' hoje. Faça 1 atividade de descanso ativo (caminhada, banho, tempo com os filhos) e planeje em 10 minutos os focos da Semana 2."
+  }
+];
+
+const ROADMAP = [
+  "Disciplina diária / fim da procrastinação",
+  "Organização pessoal em alto nível",
+  "Clareza de caminho / metas específicas",
+  "Liberdade financeira (execução)",
+  "Proatividade com família e negócios",
+  "Abertura a oportunidades / bloqueios financeiros",
+  "Proteção e centramento espiritual",
+  "Propósito de vida / dharma"
+];
+
+const CURRENT_WEEK = 1;
+
+function todayStr(){
+  const d = new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function fmtDatePt(str){
+  const [y,m,d] = str.split("-");
+  return d+"/"+m+"/"+y;
+}
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+let state = {
+  base: {morning:false, night:false, action:false, note:""},  // toques do decreto base do ciclo atual (não são por data — resetam a cada dia concluído)
+  currentDay: 0,     // índice (0-6) do dia da Semana 1 que está ativo agora
+  week1: {},         // { "0": {done:true, date:"YYYY-MM-DD"}, ... } — dias já concluídos
+  cycles: [],         // ["YYYY-MM-DD", ...] — uma entrada por dia completo (cada entrada = 1 tijolo aceso)
+  log: []             // [{date, weekDay, decree, action, note, timestamp}, ...] — histórico de anotações
+};
+
+async function loadState(){
+  try{
+    const raw = localStorage.getItem('daily-base');
+    if(raw){
+      const parsed = JSON.parse(raw);
+      state.base = {morning:!!parsed.morning, night:!!parsed.night, action:!!parsed.action, note:parsed.note||""};
+    }
+  }catch(e){ /* no data yet */ }
+  try{
+    const raw = localStorage.getItem('progress');
+    if(raw){
+      const parsed = JSON.parse(raw);
+      state.currentDay = parsed.currentDay || 0;
+      state.week1 = parsed.week1 || {};
+      state.cycles = parsed.cycles || [];
+      state.log = parsed.log || [];
+    }
+  }catch(e){ /* no data yet */ }
+}
+
+async function saveBase(){
+  try{ localStorage.setItem('daily-base', JSON.stringify(state.base)); }
+  catch(e){ console.error('erro ao salvar base', e); }
+}
+async function saveProgress(){
+  try{
+    localStorage.setItem('progress', JSON.stringify({
+      currentDay: state.currentDay,
+      week1: state.week1,
+      cycles: state.cycles,
+      log: state.log
+    }));
+  }catch(e){ console.error('erro ao salvar progresso', e); }
+}
+
+function render(){
+  const today = todayStr();
+  const rec = state.base;
+  const wk = state.week1;
+  const doneCount = Object.values(wk).filter(d=>d && d.done).length;
+  const streak = state.cycles.length;
+  const weekFinished = state.currentDay >= WEEK1_DAYS.length;
+  const baseComplete = rec.morning && rec.night && rec.action;
+
+  // muro: janela rolante de até 30 tijolos — um aceso por dia concluído, o próximo marcado como "hoje"
+  const TOTAL_SLOTS = 30;
+  const startIdx = Math.max(0, state.cycles.length - (TOTAL_SLOTS - 1));
+  let bricksHtml = "";
+  for(let i=startIdx;i<startIdx+TOTAL_SLOTS;i++){
+    const on = i < state.cycles.length;
+    const isNext = i === state.cycles.length;
+    bricksHtml += `<div class="brick ${on?'on':''} ${isNext?'today-marker':''}"></div>`;
+  }
+
+  const dayCardsHtml = WEEK1_DAYS.map((day, idx)=>{
+    const d = wk[idx] || {done:false};
+    const isDone = !!d.done;
+    const isActive = idx === state.currentDay && !isDone;
+    const isLocked = idx > state.currentDay;
+    const stateClass = isDone ? 'done' : (isLocked ? 'locked' : 'active');
+    return `
+    <div class="day-card ${stateClass}" data-day="${idx}">
+      <div class="day-top">
+        <div class="day-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#10161F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="day-meta">
+          <div class="day-num">Dia ${idx+1} de 7${isLocked?' · bloqueado':''}${isActive?' · hoje':''}</div>
+          <p class="day-decree">"${day.decree}"</p>
+          <p class="day-action"><b>Ação:</b> ${day.action}</p>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+
+  const historyHtml = state.log.length
+    ? state.log.slice().reverse().map(e=>`
+        <div class="history-item">
+          <div class="history-date">${fmtDatePt(e.date)} · Dia ${e.weekDay} da Semana 1</div>
+          <div class="history-note">${e.note ? escapeHtml(e.note) : '<i>sem anotação</i>'}</div>
+        </div>`).join("")
+    : `<div class="history-empty">Nenhum registro ainda. Ele aparece aqui assim que você concluir o primeiro dia.</div>`;
+
+  const roadmapHtml = ROADMAP.map((name, idx)=>{
+    const weekNum = idx+1;
+    const isActive = weekNum===CURRENT_WEEK;
+    const isDone = weekNum < CURRENT_WEEK;
+    return `<div class="rm-item ${isActive?'active':''} ${isDone?'done':''}">
+      <span class="rm-num">S${weekNum}</span>
+      <span class="rm-name">${name}</span>
+    </div>`;
+  }).join("");
+
+  document.getElementById('app').innerHTML = `
+    <header class="top">
+      <div class="eyebrow">
+        <span>Plano de Execução — 12 Meses</span>
+        <span id="today-date">${fmtDatePt(today)}</span>
+      </div>
+      <h1>Muro da Liberdade</h1>
+      <p class="sub">Cada dia marcado é um tijolo. O muro não se constrói de uma vez — se constrói tijolo após tijolo, todos os dias.</p>
+
+      <div class="wall-card">
+        <div class="wall-label">
+          <span>Últimos 30 dias</span>
+          <span>sequência atual: <b>${streak} ${streak===1?'dia':'dias'}</b></span>
+        </div>
+        <div class="wall">${bricksHtml}</div>
+      </div>
+    </header>
+
+    <div class="decree-card">
+      <span class="decree-tag">Decreto Base · Diário</span>
+      <p class="decree-text">"Eu sou o homem que age. Cada escolha de hoje é um tijolo da liberdade da minha família. Eu ajo mesmo com medo, mesmo cansado, mesmo sozinho."</p>
+      ${weekFinished ? `<p class="week-done-msg">Semana 1 concluída! 🎉 Os toggles voltam quando a Semana 2 estiver disponível.</p>` : `
+      <div class="toggles">
+        <button class="toggle-btn ${rec.morning?'checked':''}" onclick="window.__toggleBase('morning')">
+          <span class="box"></span> Manhã — falado 3x em voz alta
+        </button>
+        <button class="toggle-btn ${rec.night?'checked':''}" onclick="window.__toggleBase('night')">
+          <span class="box"></span> Noite — revisão feita
+        </button>
+        <button class="toggle-btn ${rec.action?'checked':''}" onclick="window.__toggleBase('action')">
+          <span class="box"></span> Ação do dia — concluída
+        </button>
+      </div>
+      <div class="reflect">
+        <label>Que ação de hoje honrou esse decreto?</label>
+        <textarea id="reflection-input" placeholder="Escreva 1 frase antes de dormir… (isso vira o registro do dia quando você encerrar o dia)" onblur="window.__saveNote(this.value)">${rec.note||""}</textarea>
+      </div>
+      <div class="close-day-row">
+        <button class="close-day-btn ${baseComplete?'ready':''}" onclick="window.__completeDay()">Encerrar o dia</button>
+        ${!baseComplete ? `<p class="close-day-hint">Marque manhã, noite e ação do dia acima para liberar o encerramento.</p>` : ''}
+      </div>
+      `}
+    </div>
+
+    <div class="week-head">
+      <h2>Semana 1 · Disciplina Diária</h2>
+      <span class="week-progress-text">${doneCount}/7</span>
+    </div>
+    <div class="week-bar"><div class="week-bar-fill" style="width:${(doneCount/7*100).toFixed(0)}%"></div></div>
+
+    ${dayCardsHtml}
+
+    <div class="roadmap">
+      <div class="roadmap-label">Mapa das 8 semanas — onde você está</div>
+      <div class="roadmap-grid">${roadmapHtml}</div>
+    </div>
+
+    <div class="history-toggle-row">
+      <button class="history-btn" onclick="window.__toggleHistory()">${state.showHistory?'ocultar':'ver'} histórico de ações (${state.log.length})</button>
+      <button class="history-btn" onclick="window.__copyHistoryJson()">copiar JSON</button>
+      <button class="reset-btn" onclick="window.__resetAll()">reiniciar dados salvos</button>
+    </div>
+    ${state.showHistory ? `
+    <div class="history-card">
+      <div class="history-label">Histórico de ações — ${state.log.length} registro${state.log.length===1?'':'s'}</div>
+      ${historyHtml}
+    </div>` : ''}
+  `;
+}
+
+window.__toggleBase = async function(field){
+  state.base[field] = !state.base[field];
+  render();
+  await saveBase();
+};
+
+window.__saveNote = async function(val){
+  state.base.note = val;
+  await saveBase();
+};
+
+// Ao cumprir a ação do dia ativo: fecha o ciclo, acende o próximo tijolo,
+// registra a anotação no histórico e reseta manhã/noite pra serem ticadas de novo.
+window.__completeDay = async function(){
+  const idx = state.currentDay;
+  if(idx >= WEEK1_DAYS.length) return;       // semana já concluída
+  if(state.week1[idx] && state.week1[idx].done) return;
+  if(!(state.base.morning && state.base.night && state.base.action)){
+    alert("Marque manhã, noite e ação do dia antes de encerrar o dia.");
+    return;
+  }
+  const today = todayStr();
+  const note = state.base.note || "";
+
+  state.week1[idx] = {done:true, date:today};
+  state.log.push({
+    date: today,
+    weekDay: idx+1,
+    decree: WEEK1_DAYS[idx].decree,
+    action: WEEK1_DAYS[idx].action,
+    note: note,
+    timestamp: new Date().toISOString()
+  });
+  state.cycles.push(today);                              // acende o próximo tijolo
+  state.currentDay = Math.min(idx+1, WEEK1_DAYS.length);  // destrava o próximo dia
+  state.base = {morning:false, night:false, action:false, note:""};  // reseta os toggles pro próximo dia
+
+  render();
+  await saveProgress();
+  await saveBase();
+};
+
+window.__toggleHistory = function(){
+  state.showHistory = !state.showHistory;
+  render();
+};
+
+window.__copyHistoryJson = async function(){
+  const json = JSON.stringify(state.log, null, 2);
+  try{
+    await navigator.clipboard.writeText(json);
+    alert("Histórico copiado como JSON (" + state.log.length + " registros).");
+  }catch(e){
+    alert(json); // fallback: mostra o JSON pra copiar manualmente
+  }
+};
+
+window.__resetAll = async function(){
+  if(!confirm("Isso vai apagar todo o progresso salvo neste dispositivo, incluindo o histórico de ações. Confirma?")) return;
+  state = {base:{morning:false, night:false, action:false, note:""}, currentDay:0, week1:{}, cycles:[], log:[], showHistory:false};
+  render();
+  await saveBase();
+  await saveProgress();
+};
+
+(async function init(){
+  await loadState();
+  render();
+})();
+
+})();
+</script>
+</body>
+</html>
