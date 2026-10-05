@@ -80,7 +80,12 @@
     display:grid;
     grid-template-columns:repeat(10, 1fr);
     gap:3px;
+    max-height:280px;
+    overflow-y:auto;
+    padding-right:2px;
   }
+  .wall::-webkit-scrollbar{width:5px;}
+  .wall::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px;}
   .brick{
     aspect-ratio:2/1;
     background:var(--brick-off);
@@ -490,7 +495,158 @@ const ROADMAP = [
   "Propósito de vida / dharma"
 ];
 
-const CURRENT_WEEK = 1;
+const WEEK2_DAYS = [
+  {decree:"Eu crio ordem porque a ordem externa liberta minha mente para o que importa. Bagunça é decisão adiada.",
+   action:"Escolha 1 espaço físico (mesa, gaveta, e-mail) que está te drenando energia visualmente. Organize ele por completo hoje, sem deixar pela metade."},
+  {decree:"Eu decido o que é urgente e o que é importante — e não deixo o urgente sequestrar o importante.",
+   action:"Liste suas tarefas pendentes e classifique cada uma em Urgente/Importante. Execute primeiro as do quadrante 'Importante, não urgente'."},
+  {decree:"Meus rituais me carregam quando a motivação falha. Eu não dependo de ânimo, dependo de rotina.",
+   action:"Escreva sua rotina ideal de manhã e de noite em 5 passos cada. Siga ela hoje, do início ao fim, sem pular etapas."},
+  {decree:"Eu escolho o que entra na minha atenção. Notificação não é obrigação.",
+   action:"Desative notificações de pelo menos 5 apps não essenciais e cancele inscrição de 10 e-mails/listas que você nunca lê."},
+  {decree:"Minha agenda reflete minhas prioridades reais, não as urgências dos outros.",
+   action:"Bloqueie na agenda os próximos 7 dias: horários fixos para trabalho profundo, família e descanso. Proteja esses blocos como compromissos inegociáveis."},
+  {decree:"Sistemas bons me tornam confiável mesmo nos dias ruins. Eu não confio na força de vontade sozinha.",
+   action:"Documente por escrito 1 processo que você repete toda semana (financeiro, compras, reuniões) como um checklist simples."},
+  {decree:"Eu reviso pra corrigir o rumo, não pra me punir. A revisão semanal é meu leme.",
+   action:"Faça a revisão da semana: o que funcionou, o que travou, o que muda na próxima. Escreva as 3 prioridades da próxima semana."}
+];
+
+const WEEK3_DAYS = [
+  {decree:"Eu sei pra onde vou. Sem destino claro, toda energia se dispersa.",
+   action:"Escreva, em 1 parágrafo, como você quer que sua vida esteja daqui a 1 ano — família, dinheiro, saúde, propósito. Seja específico."},
+  {decree:"Minhas metas têm números e prazos. Sonho vago não vira realidade.",
+   action:"Defina 3 metas específicas e mensuráveis para os próximos 90 dias, com prazo e número claro para cada uma."},
+  {decree:"Eu escolho 1 prioridade absoluta e protejo ela de tudo o que tenta competir.",
+   action:"Entre as 3 metas, escolha a que mais te aproxima da sua visão de 1 ano. Dedique o primeiro bloco livre do dia exclusivamente a ela."},
+  {decree:"Todo destino grande vira caminhável quando eu o quebro em passos pequenos.",
+   action:"Pegue sua meta prioritária e quebre ela em 5 marcos concretos. Escreva o primeiro passo que você pode dar essa semana."},
+  {decree:"Eu enxergo meus obstáculos antes que eles me peguem de surpresa.",
+   action:"Liste os 3 maiores obstáculos entre você e sua meta prioritária. Para cada um, escreva uma ação concreta pra reduzir ou remover ele."},
+  {decree:"Eu me comprometo em voz alta porque isso muda o peso da minha palavra.",
+   action:"Compartilhe sua meta prioritária com 1 pessoa de confiança e combine uma data de check-in pra prestar contas do progresso."},
+  {decree:"Eu ajusto o rumo sem abandonar o destino. Clareza se constrói revisando, não desistindo.",
+   action:"Revise as metas da semana: o que avançou, o que precisa de ajuste. Planeje o próximo passo da semana que vem."}
+];
+
+const WEEK4_DAYS = [
+  {decree:"Eu encaro meus números sem me esconder deles. A verdade financeira, por dura que seja, é o ponto de partida da liberdade.",
+   action:"Liste hoje, com números reais: toda renda, toda dívida e todo gasto fixo mensal. Sem arredondar pra cima nem pra baixo."},
+  {decree:"Cada real que eu gasto é uma escolha consciente, não um reflexo automático.",
+   action:"Anote absolutamente todo gasto de hoje, do café ao boleto, num app ou papel. Nenhum gasto passa sem ser registrado."},
+  {decree:"Meu orçamento é meu mapa, não minha prisão. Eu decido pra onde o dinheiro vai antes que ele decida por mim.",
+   action:"Monte ou atualize seu orçamento do mês com valores reais por categoria. Defina um teto claro pra cada uma."},
+  {decree:"Eu não espero a renda aumentar sozinha — eu ajo pra aumentar ela.",
+   action:"Dê 1 passo concreto hoje pra aumentar sua renda: negocie um valor, envie uma proposta, cobre uma fatura ou ofereça um serviço extra."},
+  {decree:"Eu pago a mim mesmo primeiro. Poupar não é o que sobra, é o que separo antes de tudo.",
+   action:"Transfira hoje, mesmo um valor pequeno, para uma conta de poupança ou investimento separada — de preferência automatizando isso."},
+  {decree:"Cada dívida que eu reduzo é um pedaço da minha liberdade que eu recupero.",
+   action:"Faça um pagamento extra (mesmo pequeno) na dívida de maior juros, ou ligue hoje pra negociar uma condição melhor com o credor."},
+  {decree:"Eu reviso meus números toda semana porque o que não é medido, não é comandado.",
+   action:"Feche a semana revisando gastos x orçamento. Ajuste as categorias que estouraram e defina o foco financeiro da próxima semana."}
+];
+
+const WEEK5_DAYS = [
+  {decree:"Eu ofereço presença de verdade, não só tempo no mesmo cômodo. Presente é onde meu celular não está.",
+   action:"Reserve hoje um bloco sem celular, sem notificação, só com sua família. Marque no calendário como compromisso inegociável."},
+  {decree:"Eu falo o que precisa ser falado, mesmo quando é desconfortável. Silêncio adiado vira distância.",
+   action:"Tenha hoje 1 conversa honesta que você vem adiando — com parceira, familiar, sócio ou cliente. Diga o que precisa ser dito, com respeito."},
+  {decree:"Eu tomo iniciativa no negócio porque oportunidade não bate na porta de quem espera.",
+   action:"Faça hoje 1 contato de negócio que você vem evitando: uma ligação, uma proposta, um follow-up ou um pitch que estava parado."},
+  {decree:"Eu multiplico minha capacidade quando ensino e delego, não quando faço tudo sozinho.",
+   action:"Delegue ou ensine para outra pessoa 1 tarefa que só você faz hoje — na família ou no negócio."},
+  {decree:"Minha palavra empenhada é um compromisso que eu honro até o fim.",
+   action:"Conclua hoje 1 compromisso pendente com a família ou com um cliente/parceiro de negócio que está em aberto há tempo demais."},
+  {decree:"Eu equilibro construir o futuro com estar presente no agora. Um não pode devorar o outro.",
+   action:"Planeje a agenda da próxima semana equilibrando blocos de trabalho/negócio com blocos protegidos de família e descanso."},
+  {decree:"A gratidão que eu digo em voz alta fortalece os laços que sustentam tudo o que construo.",
+   action:"Agradeça hoje, explicitamente, a 1 pessoa da família e 1 pessoa do negócio. Revise a semana: onde você foi proativo e onde ainda reage."}
+];
+
+const WEEK6_DAYS = [
+  {decree:"Eu identifico as crenças que me prendem à escassez para poder escolher outras.",
+   action:"Escreva 3 crenças limitantes que você carrega sobre dinheiro. Para cada uma, escreva uma frase que a desafia com um fato ou exemplo real."},
+  {decree:"Eu me mostro. Oportunidade não encontra quem se esconde.",
+   action:"Coloque-se visível hoje de alguma forma concreta: publique algo, candidate-se a algo, envie uma proposta ou apresente uma ideia guardada."},
+  {decree:"Minha rede é meu terreno fértil. Eu cultivo relações antes de precisar delas.",
+   action:"Reconecte-se hoje com 1 contato que pode abrir uma porta — uma mensagem genuína, sem pedir nada, só reatando o vínculo."},
+  {decree:"Eu recebo com a mesma dignidade com que dou. Aceitar ajuda não me diminui.",
+   action:"Aceite hoje 1 ajuda, elogio ou oferta sem desviar ou minimizar. Perceba o desconforto e deixe ele passar sem recusar."},
+  {decree:"Eu me movo mesmo sem garantia total. Todo caminho novo pede um risco calculado.",
+   action:"Dê hoje 1 passo em direção a um risco calculado que você vem adiando (um investimento pequeno, uma conversa, uma inscrição, um início)."},
+  {decree:"Eu solto a escassez soltando algo com generosidade. O que eu retenho com medo, eu não multiplico.",
+   action:"Doe algo hoje — tempo, conhecimento, dinheiro ou um objeto — como um ato consciente de abundância, sem esperar retorno."},
+  {decree:"Eu reconheço as portas que se abriram, mesmo as pequenas, porque é assim que aprendo a enxergá-las.",
+   action:"Revise a semana e liste toda oportunidade que apareceu, por menor que fosse. Escreva o que você fará com pelo menos uma delas."}
+];
+
+const WEEK7_DAYS = [
+  {decree:"Eu me ancoro antes de agir. O que nasce do centro é mais forte do que o que nasce da pressa.",
+   action:"Reserve os primeiros 10 minutos do dia para silêncio, oração ou meditação, antes de qualquer tela ou tarefa."},
+  {decree:"Meu 'não' protege meu 'sim' mais importante. Fronteira não é rejeição, é cuidado.",
+   action:"Diga não hoje para 1 coisa que te drena e não te serve — um compromisso, uma pessoa, uma tarefa que não é sua."},
+  {decree:"Eu escolho conscientemente o que — e quem — tem acesso à minha energia.",
+   action:"Identifique 1 ambiente, conteúdo ou influência tóxica na sua rotina e reduza deliberadamente sua exposição a ela hoje."},
+  {decree:"Minha fé é uma âncora, não um enfeite. Eu a alimento como alimento o corpo.",
+   action:"Leia, ouça ou escreva algo hoje que fortaleça sua fé ou seus valores mais profundos — dedique ao menos 15 minutos só a isso."},
+  {decree:"Eu solto o que carrego para poder seguir mais leve. Ressentimento guardado só me pesa a mim.",
+   action:"Escreva uma carta (sem precisar enviar) para alguém que você precisa perdoar — ou para si mesmo. Coloque no papel o que está soltando."},
+  {decree:"Meu ritual diário é o fio que me conecta a algo maior do que a urgência do dia.",
+   action:"Crie um pequeno ritual espiritual diário (respiração, gratidão, oração, caminhada em silêncio) e pratique ele hoje do início ao fim."},
+  {decree:"Eu observo meu estado interior com a mesma atenção que dou às minhas tarefas.",
+   action:"Reflita por escrito sobre como estava seu estado interior essa semana — mais centrado ou mais reativo — e o que sustentou os momentos bons."}
+];
+
+const WEEK8_DAYS = [
+  {decree:"Eu existo para algo maior do que sobreviver ao dia. Meu propósito não é um luxo, é uma bússola.",
+   action:"Escreva um rascunho da sua missão pessoal em 2-3 frases: por que você existe, o que quer construir, para quem."},
+  {decree:"O que eu deixo para trás fala mais alto do que o que eu acumulo.",
+   action:"Escreva o que você quer que digam sobre você daqui a 20 anos — como pai/mãe, parceiro, profissional, ser humano."},
+  {decree:"Eu alinho meus dias ao meu propósito, um ajuste de cada vez.",
+   action:"Identifique 1 atividade do seu dia a dia que está desalinhada do seu propósito e faça 1 ajuste concreto nela hoje."},
+  {decree:"Meu propósito se prova no que eu ofereço aos outros, não só no que busco pra mim.",
+   action:"Faça hoje 1 ação de serviço genuína, alinhada ao seu propósito — ajudar, ensinar, doar tempo ou conhecimento a alguém que precisa."},
+  {decree:"Meu maior talento é uma ferramenta que eu escolho usar com intenção, não guardar por medo.",
+   action:"Identifique seu talento mais forte e use ele deliberadamente hoje em algo que realmente importa — não só no automático do trabalho."},
+  {decree:"Eu transformo 8 semanas de decretos em 1 compromisso que carrego comigo.",
+   action:"Releia as lições das últimas 8 semanas e escreva, em 1 página, seu credo pessoal — os princípios que você decide viver a partir de hoje."},
+  {decree:"Eu celebro o caminho percorrido porque celebrar também é disciplina — e sigo, porque o muro continua sendo construído.",
+   action:"Celebre esse primeiro ciclo de 56 dias de alguma forma concreta. Revise os 8 objetivos e escreva a intenção do próximo ciclo."}
+];
+
+const WEEKS = [
+  {title: ROADMAP[0], days: WEEK1_DAYS},
+  {title: ROADMAP[1], days: WEEK2_DAYS},
+  {title: ROADMAP[2], days: WEEK3_DAYS},
+  {title: ROADMAP[3], days: WEEK4_DAYS},
+  {title: ROADMAP[4], days: WEEK5_DAYS},
+  {title: ROADMAP[5], days: WEEK6_DAYS},
+  {title: ROADMAP[6], days: WEEK7_DAYS},
+  {title: ROADMAP[7], days: WEEK8_DAYS}
+];
+
+const DAYS_PER_WEEK = 7;
+const PROGRAM_LENGTH = WEEKS.length * DAYS_PER_WEEK; // 56 dias — 1 ciclo pelos 8 objetivos
+const YEAR_TOTAL = 365;
+// dias acumulados ao fim de cada mês (ano não-bissexto) — usado pra revelar o muro em blocos de ~28-31 dias
+const MONTH_CUM = [31,59,90,120,151,181,212,243,273,304,334,365];
+
+// posição atual dentro do ciclo de 8 semanas, a partir do total de dias já fechados
+function getProgramPosition(){
+  const total = state.currentDay;
+  const round = Math.floor(total / PROGRAM_LENGTH) + 1;
+  const posInRound = total % PROGRAM_LENGTH;
+  const weekIndex = Math.floor(posInRound / DAYS_PER_WEEK);
+  const dayIndex = posInRound % DAYS_PER_WEEK;
+  return {round, weekIndex, dayIndex};
+}
+
+// quantos tijolos ficam visíveis no muro, crescendo a cada mês (28-31 dias) até os 365 do ano
+function visibleWallSlots(){
+  const total = state.currentDay;
+  for(const cum of MONTH_CUM){ if(total < cum) return cum; }
+  return YEAR_TOTAL;
+}
 
 function todayStr(){
   const d = new Date();
@@ -508,10 +664,9 @@ function escapeHtml(str){
 
 let state = {
   base: {morning:false, night:false, action:false, note:""},  // toques do decreto base do ciclo atual (não são por data — resetam a cada dia concluído)
-  currentDay: 0,     // índice (0-6) do dia da Semana 1 que está ativo agora
-  week1: {},         // { "0": {done:true, date:"YYYY-MM-DD"}, ... } — dias já concluídos
-  cycles: [],         // ["YYYY-MM-DD", ...] — uma entrada por dia completo (cada entrada = 1 tijolo aceso)
-  log: []             // [{date, weekDay, decree, action, note, timestamp}, ...] — histórico de anotações
+  currentDay: 0,      // total de dias já fechados desde o início (0-364) — avança pelas 8 semanas e recomeça o ciclo até fechar o ano
+  cycles: [],          // ["YYYY-MM-DD", ...] — uma entrada por dia completo (cada entrada = 1 tijolo aceso)
+  log: []              // [{date, week, weekTitle, weekDay, decree, action, note, timestamp}, ...] — histórico de anotações
 };
 
 async function loadState(){
@@ -527,7 +682,6 @@ async function loadState(){
     if(raw){
       const parsed = JSON.parse(raw);
       state.currentDay = parsed.currentDay || 0;
-      state.week1 = parsed.week1 || {};
       state.cycles = parsed.cycles || [];
       state.log = parsed.log || [];
     }
@@ -542,7 +696,6 @@ async function saveProgress(){
   try{
     localStorage.setItem('progress', JSON.stringify({
       currentDay: state.currentDay,
-      week1: state.week1,
       cycles: state.cycles,
       log: state.log
     }));
@@ -552,27 +705,26 @@ async function saveProgress(){
 function render(){
   const today = todayStr();
   const rec = state.base;
-  const wk = state.week1;
-  const doneCount = Object.values(wk).filter(d=>d && d.done).length;
   const streak = state.cycles.length;
-  const weekFinished = state.currentDay >= WEEK1_DAYS.length;
+  const yearComplete = state.currentDay >= YEAR_TOTAL;
+  const {round, weekIndex, dayIndex} = getProgramPosition();
+  const currentWeek = WEEKS[weekIndex];
+  const doneCount = dayIndex; // dias já fechados dentro da semana atual
   const baseComplete = rec.morning && rec.night && rec.action;
 
-  // muro: janela rolante de até 30 tijolos — um aceso por dia concluído, o próximo marcado como "hoje"
-  const TOTAL_SLOTS = 30;
-  const startIdx = Math.max(0, state.cycles.length - (TOTAL_SLOTS - 1));
+  // muro: cresce em blocos de ~28-31 dias (meses do ano) até mostrar os 365 tijolos
+  const visibleSlots = visibleWallSlots();
   let bricksHtml = "";
-  for(let i=startIdx;i<startIdx+TOTAL_SLOTS;i++){
+  for(let i=0;i<visibleSlots;i++){
     const on = i < state.cycles.length;
     const isNext = i === state.cycles.length;
     bricksHtml += `<div class="brick ${on?'on':''} ${isNext?'today-marker':''}"></div>`;
   }
 
-  const dayCardsHtml = WEEK1_DAYS.map((day, idx)=>{
-    const d = wk[idx] || {done:false};
-    const isDone = !!d.done;
-    const isActive = idx === state.currentDay && !isDone;
-    const isLocked = idx > state.currentDay;
+  const dayCardsHtml = currentWeek.days.map((day, idx)=>{
+    const isDone = idx < dayIndex;
+    const isActive = idx === dayIndex && !yearComplete;
+    const isLocked = idx > dayIndex;
     const stateClass = isDone ? 'done' : (isLocked ? 'locked' : 'active');
     return `
     <div class="day-card ${stateClass}" data-day="${idx}">
@@ -592,15 +744,15 @@ function render(){
   const historyHtml = state.log.length
     ? state.log.slice().reverse().map(e=>`
         <div class="history-item">
-          <div class="history-date">${fmtDatePt(e.date)} · Dia ${e.weekDay} da Semana 1</div>
+          <div class="history-date">${fmtDatePt(e.date)} · Semana ${e.week||1} · Dia ${e.weekDay} — ${e.weekTitle||ROADMAP[0]}</div>
           <div class="history-note">${e.note ? escapeHtml(e.note) : '<i>sem anotação</i>'}</div>
         </div>`).join("")
     : `<div class="history-empty">Nenhum registro ainda. Ele aparece aqui assim que você concluir o primeiro dia.</div>`;
 
   const roadmapHtml = ROADMAP.map((name, idx)=>{
     const weekNum = idx+1;
-    const isActive = weekNum===CURRENT_WEEK;
-    const isDone = weekNum < CURRENT_WEEK;
+    const isActive = idx===weekIndex && !yearComplete;
+    const isDone = idx<weekIndex || (idx===weekIndex && yearComplete) || round>1;
     return `<div class="rm-item ${isActive?'active':''} ${isDone?'done':''}">
       <span class="rm-num">S${weekNum}</span>
       <span class="rm-name">${name}</span>
@@ -618,7 +770,7 @@ function render(){
 
       <div class="wall-card">
         <div class="wall-label">
-          <span>Últimos 30 dias</span>
+          <span>${streak}/${YEAR_TOTAL} tijolos${round>1?' · ciclo '+round:''}</span>
           <span>sequência atual: <b>${streak} ${streak===1?'dia':'dias'}</b></span>
         </div>
         <div class="wall">${bricksHtml}</div>
@@ -628,7 +780,7 @@ function render(){
     <div class="decree-card">
       <span class="decree-tag">Decreto Base · Diário</span>
       <p class="decree-text">"Eu sou o homem que age. Cada escolha de hoje é um tijolo da liberdade da minha família. Eu ajo mesmo com medo, mesmo cansado, mesmo sozinho."</p>
-      ${weekFinished ? `<p class="week-done-msg">Semana 1 concluída! 🎉 Os toggles voltam quando a Semana 2 estiver disponível.</p>` : `
+      ${yearComplete ? `<p class="week-done-msg">🎉 Ano completo! Você fechou os 365 tijolos do Muro da Liberdade, passando pelos 8 objetivos ${round-1} ${round-1===1?'vez':'vezes'}. Use o botão "reiniciar" se quiser começar um novo ano do zero.</p>` : `
       <div class="toggles">
         <button class="toggle-btn ${rec.morning?'checked':''}" onclick="window.__toggleBase('morning')">
           <span class="box"></span> Manhã — falado 3x em voz alta
@@ -652,7 +804,7 @@ function render(){
     </div>
 
     <div class="week-head">
-      <h2>Semana 1 · Disciplina Diária</h2>
+      <h2>Semana ${weekIndex+1} · ${currentWeek.title}${round>1?' · Ciclo '+round:''}</h2>
       <span class="week-progress-text">${doneCount}/7</span>
     </div>
     <div class="week-bar"><div class="week-bar-fill" style="width:${(doneCount/7*100).toFixed(0)}%"></div></div>
@@ -688,30 +840,31 @@ window.__saveNote = async function(val){
   await saveBase();
 };
 
-// Ao cumprir a ação do dia ativo: fecha o ciclo, acende o próximo tijolo,
-// registra a anotação no histórico e reseta manhã/noite pra serem ticadas de novo.
+// Ao cumprir manhã + noite + ação do dia e encerrar: fecha o ciclo, acende o próximo tijolo,
+// registra a anotação no histórico e reseta os toques pra serem ticados de novo no dia seguinte.
 window.__completeDay = async function(){
-  const idx = state.currentDay;
-  if(idx >= WEEK1_DAYS.length) return;       // semana já concluída
-  if(state.week1[idx] && state.week1[idx].done) return;
+  if(state.currentDay >= YEAR_TOTAL) return; // ano já completo
   if(!(state.base.morning && state.base.night && state.base.action)){
     alert("Marque manhã, noite e ação do dia antes de encerrar o dia.");
     return;
   }
+  const {weekIndex, dayIndex} = getProgramPosition();
+  const dayData = WEEKS[weekIndex].days[dayIndex];
   const today = todayStr();
   const note = state.base.note || "";
 
-  state.week1[idx] = {done:true, date:today};
   state.log.push({
     date: today,
-    weekDay: idx+1,
-    decree: WEEK1_DAYS[idx].decree,
-    action: WEEK1_DAYS[idx].action,
+    week: weekIndex+1,
+    weekTitle: WEEKS[weekIndex].title,
+    weekDay: dayIndex+1,
+    decree: dayData.decree,
+    action: dayData.action,
     note: note,
     timestamp: new Date().toISOString()
   });
-  state.cycles.push(today);                              // acende o próximo tijolo
-  state.currentDay = Math.min(idx+1, WEEK1_DAYS.length);  // destrava o próximo dia
+  state.cycles.push(today);                                   // acende o próximo tijolo
+  state.currentDay = Math.min(state.currentDay+1, YEAR_TOTAL); // avança pro próximo dia (troca de semana/ciclo automaticamente)
   state.base = {morning:false, night:false, action:false, note:""};  // reseta os toggles pro próximo dia
 
   render();
@@ -736,7 +889,7 @@ window.__copyHistoryJson = async function(){
 
 window.__resetAll = async function(){
   if(!confirm("Isso vai apagar todo o progresso salvo neste dispositivo, incluindo o histórico de ações. Confirma?")) return;
-  state = {base:{morning:false, night:false, action:false, note:""}, currentDay:0, week1:{}, cycles:[], log:[], showHistory:false};
+  state = {base:{morning:false, night:false, action:false, note:""}, currentDay:0, cycles:[], log:[], showHistory:false};
   render();
   await saveBase();
   await saveProgress();
